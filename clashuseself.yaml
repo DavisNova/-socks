@@ -1,0 +1,433 @@
+#dns可自行修改
+mixed-port: 7890
+allow-lan: true
+bind-address: '*'
+mode: rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+dns:
+    enable: true
+    ipv6: true
+    default-nameserver: [223.5.5.5, 119.29.29.29, 8.8.8.8]
+    enhanced-mode: fake-ip
+    fake-ip-range: 198.18.0.1/16
+    use-hosts: true
+    nameserver: ['https://doh.pub/dns-query', 'https://dns.alidns.com/dns-query']
+    fallback: ['https://doh.dns.sb/dns-query', 'https://dns.cloudflare.com/dns-query', 'https://dns.twnic.tw/dns-query', 'tls://8.8.4.4:853']
+    fallback-filter: { geoip: true, ipcidr: [240.0.0.0/4, 0.0.0.0/32] }
+
+
+#（二区）==============================（代理协议）
+#当前12个协议节点配置模版，按需求修改，如某协议节点不用，则无需删除，确保三区代理分流中没有该name节点名称即可
+proxies:
+#==============================（vless-reality-vision节点）
+- name: vless-reality-vision节点               #可自定义名称
+  type: vless
+  server: 94.124.119.202                             #解析的域名或IP
+  port: 14463                                 #自定义的端口
+  uuid: 3e086ffa-7518-4f52-d736-cba5357bc144   #自定义的uuid
+  network: tcp
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: www.cloudflare.com                   #自定义的第三方域名
+  reality-opts: 
+    public-key: UK7qxWWGfRQcQfwaGpHnqmmqqJBut4jxve8AeDDJ2UI    #自定义的public-key
+    short-id: 9f105267                        #自定义的short-id
+  client-fingerprint: chrome                  #自定义的浏览器指纹
+
+- name: vless-reality-vision-02               #可自定义名称
+  type: vless
+  server: 154.17.5.9                             #解析的域名或IP
+  port: 52730                                 #自定义的端口
+  uuid: 695b0d32-036d-4c34-9190-ac99d6393f92   #自定义的uuid
+  network: tcp
+  udp: true
+  tls: true
+  flow: xtls-rprx-vision
+  servername: yahoo.com                   #自定义的第三方域名
+  reality-opts: 
+    public-key: j6D_-tJM-PfeY1l-Zy5MN45tixntdhUsJUD8CtVVemA    #自定义的public-key
+    short-id: 4a7b95033b26                        #自定义的short-id
+  client-fingerprint: chrome  
+
+#==============================（vless-reality-grpc节点）
+- name: vless-reality-grpc节点                  #可自定义名称
+  type: vless
+  server: 1.2.3.4                               #解析的域名或IP
+  port: 12345                                   #自定义的端口
+  uuid: 335ec5dd-61b1-4413-980e-5e009968f633    #自定义的uuid
+  network: grpc
+  tls: true
+  udp: true
+  flow:
+  client-fingerprint: chrome                    #自定义的浏览器指纹
+  servername: www.yahoo.com                     #自定义的第三方域名
+  grpc-opts:
+    grpc-service-name: "ygkkk"                  #" "内自定义的字符
+  reality-opts:
+    public-key: Aqp9oy2EFi4NNfRMZa3I3HdGhHbOIiSDZ8L28UCF73k    #自定义的public-key
+    short-id: 24410d1c                          #自定义的short-id
+
+#==============================（vless-xtls-rprx-vision节点）
+- name: vless-xtls-rprx-vision节点              #可自定义名称
+  type: vless
+  server: yg.ygkkk.eu.org                      #解析的域名
+  port: 12345                                  #自定义的端口
+  uuid: 5f74f86b-3ee8-44f4-adc4-6666be3d315    #自定义的uuid
+  network: tcp
+  tls: true
+  udp: true
+  flow: xtls-rprx-vision
+  client-fingerprint: chrome
+
+#==============================（vless-ws-tls节点）
+- name: vless-ws-tls节点                           #可自定义名称
+  type: vless
+  server: yg.ygkkk.eu.org                          #解析的域名或者优选域名IP
+  port: 12345                                      #自定义的端口
+  uuid: 3cc9a51c-db76-4ad2-a76b-8cb993bddb73       #自定义的uuid
+  udp: true
+  tls: true
+  network: ws
+  servername: abc.ygkkk.eu.org                     #sni域名，与下面的host一致
+  ws-opts:
+    path: "/?ed=2048"                              #" "内自定义的path路径
+    headers:
+      Host: abc.ygkkk.eu.org                       #host域名，与上面的servername一致
+
+#==============================（vless-ws节点）
+- name: vless-ws节点                               #可自定义名称
+  type: vless
+  server: yg.ygkkk.eu.org                          #解析的域名或者优选域名IP
+  port: 8880                                       #自定义的端口
+  uuid: 77a571fb-4fd2-4b37-8596-1b7d9728bb5c       #自定义的uuid
+  udp: true
+  tls: false
+  network: ws
+  servername: abc.ygkkk.eu.org                     #sni域名，与下面的host一致
+  ws-opts:
+    path: "/?ed=2048"                              #" "内自定义的path路径
+    headers:
+      Host: abc.ygkkk.eu.org                       #host域名，与上面的servername一致
+
+#==============================（vmess-ws-tls节点）
+- name: vmess-ws-tls节点                           #可自定义名称
+  type: vmess
+  server: yg.ygkkk.eu.org                          #解析的域名或者优选域名IP
+  port: 12345                                      #自定义的端口
+  uuid: 3cc9a51c-db76-4ad2-a76b-8cb993bddb73       #自定义的uuid
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: true
+  network: ws
+  servername: abc.ygkkk.eu.org                     #sni域名，与下面的host一致
+  ws-opts:
+    path: "/?ed=2048"                              #自定义的path路径
+    headers:
+      Host: abc.ygkkk.eu.org                       #host域名，与上面的servername一致
+
+#==============================（vmess-ws节点）
+- name: vmess-ws节点                               #可自定义名称
+  type: vmess
+  server: yg.ygkkk.eu.org                          #解析的域名或者优选域名IP
+  port: 8880                                       #自定义的端口
+  uuid: 77a571fb-4fd2-4b37-8596-1b7d9728bb5c       #自定义的uuid
+  alterId: 0
+  cipher: auto
+  udp: true
+  tls: false
+  network: ws
+  servername: abc.ygkkk.eu.org                     #sni域名，与下面的host一致
+  ws-opts:
+    path: "/?ed=2048"                              #" "内自定义的path路径
+    headers:
+      Host: abc.ygkkk.eu.org                       #host域名，与上面的servername一致
+
+#==============================（trojan-tcp-tls节点）
+- name: trojan-tcp-tls节点                         #可自定义名称
+  type: trojan
+  server: yg.ygkkk.eu.org                          #解析的域名
+  port: 12345                                      #自定义的端口
+  password: 123456789                              #自定义的密码
+  client-fingerprint: chrome
+  udp: true
+  sni: yg.ygkkk.eu.org                             #sni域名，与上面server地址一致
+  alpn:
+    - h2
+    - http/1.1
+  skip-cert-verify: false
+    
+#==============================（hysteria1证书节点）
+- name: hysteria1证书节点                            #可自定义名称
+  type: hysteria
+  server: yg.ygkkk.eu.org                          #解析的域名
+  port: 12345                                      #自定义的端口，多端口改为 ports:空格1000,2000-3000
+  auth-str: 123456                                 #自定义的密码
+  alpn:
+    - h3
+  protocol: udp                                    #自定义协议：udp/wechat-video/faketcp
+  up: 20                                           #自定义的上传限制
+  down: 100                                        #自定义的下载限制
+  sni: yg.ygkkk.eu.org                             #sni域名，与上面server地址一致  
+  skip-cert-verify: false
+  fast-open: true
+    
+#==============================（hysteria1自签节点）
+- name: hysteria1自签节点                           #可自定义名称
+  type: hysteria
+  server: 1.2.3.4                                  #服务器本地IP
+  port: 12345                                      #自定义的端口，多端口改为 ports:空格1000,2000-3000
+  auth-str: 123456                                 #自定义的密码
+  alpn:
+    - h3
+  protocol: udp                                    #自定义协议：udp/wechat-video/faketcp
+  up: 20                                           #自定义的上传限制
+  down: 100                                        #自定义的下载限制
+  sni: www.bing.com                                #自签证书                     
+  skip-cert-verify: true
+  fast-open: true
+
+#==============================（hysteria2证书节点）
+- name: hysteria2证书节点                            #可自定义名称
+  type: hysteria2 
+  server: yg.ygkkk.eu.org                            #解析的域名
+  port: 12345                                        #自定义的端口，不支持多端口
+  password: 123456                                   #自定义的密码
+  obfs: salamander                                   #obfs混淆开启，未开启请删除此行
+  obfs-password: 123456                              #obfs混淆密码，未开启请删除此行
+  alpn:
+    - h3
+  sni: yg.ygkkk.eu.org                               #sni域名，与上面server地址一致 
+  skip-cert-verify: false
+  fast-open: true
+
+#==============================（hysteria2自签节点）
+- name: hysteria2自签节点                             #可自定义名称
+  type: hysteria2                                      
+  server: 1.2.3.4                                     #服务器本地IP
+  port: 12345                                         #自定义的端口，不支持多端口
+  password: 123456                                    #自定义的密码 
+  obfs: salamander                                    #obfs混淆开启，未开启请删除此行 
+  obfs-password: 123456                               #obfs混淆密码，未开启请删除此行     
+  alpn:
+    - h3
+  sni: www.bing.com                                    #自签证书
+  skip-cert-verify: true
+  fast-open: true
+    
+#==============================（tuic-V5证书节点）
+- name: tuic-V5证书节点                              #可自定义名称
+  server: yg.ygkkk.eu.org                          #解析的域名或IP
+  port: 12345                                      #自定义的端口
+  type: tuic
+  uuid: a806923b-737c-4581-8b13-56666f911866       #自定义的uuid
+  password: a806923b-737c-4581-8b13-56666f911866   #自定义的密码
+  alpn: [h3]
+  disable-sni: true
+  reduce-rtt: true
+  udp-relay-mode: native
+  congestion-controller: bbr
+  sni: yg.ygkkk.eu.org                            #sni域名，与上面server地址一致     
+  skip-cert-verify: false
+
+
+#==============================（tuic-V5自签节点）
+- name: tuic-V5自签节点                              #可自定义名称
+  server: 1.2.3.4                                   #服务器本地IP
+  port: 12345                                       #自定义的端口
+  type: tuic
+  uuid: a806923b-737c-4581-8b13-56666f911866       #自定义的uuid
+  password: a806923b-737c-4581-8b13-56666f911866   #自定义的密码
+  alpn: [h3]
+  disable-sni: true
+  reduce-rtt: true
+  udp-relay-mode: native
+  congestion-controller: bbr
+  sni: www.bing.com                                 #自签证书   
+  skip-cert-verify: true
+  
+
+#==============================（warp-wireguard节点）  
+- name: warp-wireguard节点                                   #可自定义名称
+  type: wireguard         
+  server: 162.159.193.10                                     #可自定义优选对端IP，与下面port的端口相对应
+  port: 2408                                                 #可自定义优选对端IP，与上面server的IP相对应
+  ip: 172.16.0.2
+  ipv6: 2606:4700:190:814e:7de3:5ddb:9d3e:9359               #与private-key相对应，如删除本行，表示仅IPV4
+  public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=
+  private-key: gK3C8ijdVlT7sd5fsdf5ssdfgsdfgsdfgobT2U+rgHo=  #获取private-key，私key
+  udp: true
+
+
+
+
+#（三区）==============================（代理分流）
+#分流组可自行创建添加，proxies参数下的name节点名称，按需求自行增减，确保出现的name节点名称在二区代理协议中可查找
+proxy-groups:
+- name: 负载均衡
+  type: load-balance
+  url: https://cp.cloudflare.com/generate_204
+  interval: 300
+  strategy: round-robin
+  proxies:
+    - warp-wireguard节点                                  #自定义添加协议的name字段
+    - vless-ws-tls节点
+    - vless-ws节点
+
+- name: 自动选择
+  type: url-test
+  url: https://cp.cloudflare.com/generate_204
+  interval: 300
+  tolerance: 50
+  proxies:
+    - vless-reality-vision节点                            #自定义添加协议的name字段
+    - vless-reality-grpc节点
+
+- name: 手动选择-住宅01
+  type: select
+  proxies:
+    - vless-reality-vision节点                            #自定义添加协议的name字段
+    - vless-reality-vision-02
+
+- name: 手动选择-住宅02
+  type: select
+  proxies:
+    - vless-reality-vision节点                            #自定义添加协议的name字段
+    - vless-reality-vision-02
+
+- name: 手动选择-住宅03
+  type: select
+  proxies:
+    - vless-reality-vision节点                            #自定义添加协议的name字段
+    - vless-reality-vision-02
+
+    
+- name: 🌍选择代理节点
+  type: select
+  proxies:
+    - 负载均衡                                            #自定义添加协议的name字段
+    - 自动选择
+    - DIRECT
+    - vless-reality-vision节点                                    
+    - vless-reality-grpc节点
+    - vless-xtls-rprx-vision节点
+    - vless-ws-tls节点
+    - vless-ws节点
+    - vmess-ws-tls节点
+    - vmess-ws节点
+    - trojan-tcp-tls节点
+    - hysteria1证书节点
+    - hysteria1自签节点
+    - hysteria2证书节点
+    - hysteria2自签节点
+    - tuic-V5证书节点
+    - tuic-V5自签节点 
+    - warp-wireguard节点
+
+
+#（四区）==============================（代理规则）
+#代理规则可自行添加 
+rules:
+  # 为两台手机设置不同的代理节点
+  - SRC-IP-CIDR,192.168.88.100/32,手动选择-住宅01  # 第一台手机通过 手动选择-住宅01
+  - SRC-IP-CIDR,192.168.88.248/32,手动选择-住宅02  # 第二台手机通过 手动选择-住宅02
+#  - SRC-MAC-ADDR,d2:95:d3:c1:f8:8b,手动选择-住宅01
+ # - SRC-MAC-ADDR,d2:95:d3:c1:f8:8b,手动选择-住宅01
+
+  # 来喜软件的流量处理 - 假设来喜软件不需要走代理，流量直连
+ # - DOMAIN-SUFFIX,laixi.com,DIRECT  # 假设来喜软件的域名为 laixi.com，流量直连
+
+  # 常见的中国大陆域名或服务直连
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,apple-dns.net,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+  - DOMAIN-SUFFIX,icloud-content.com,DIRECT
+  - DOMAIN-SUFFIX,me.com,DIRECT
+  - DOMAIN-SUFFIX,aaplimg.com,DIRECT
+  - DOMAIN-SUFFIX,cdn-apple.com,DIRECT
+  - DOMAIN-SUFFIX,126.com,DIRECT
+  - DOMAIN-SUFFIX,126.net,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,360buyimg.com,DIRECT
+  - DOMAIN-SUFFIX,36kr.com,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,autonavi.com,DIRECT
+  - DOMAIN-KEYWORD,baidu,DIRECT
+  - DOMAIN-SUFFIX,bdimg.com,DIRECT
+  - DOMAIN-SUFFIX,bdstatic.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,caiyunapp.com,DIRECT
+  - DOMAIN-SUFFIX,csdn.net,DIRECT
+  - DOMAIN-SUFFIX,ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,douban.com,DIRECT
+  - DOMAIN-SUFFIX,doubanio.com,DIRECT
+  - DOMAIN-SUFFIX,ele.me,DIRECT
+  - DOMAIN-SUFFIX,fir.im,DIRECT
+  - DOMAIN-SUFFIX,gtimg.com,DIRECT
+  - DOMAIN-SUFFIX,hxcdn.net,DIRECT
+  - DOMAIN-SUFFIX,iciba.com,DIRECT
+  - DOMAIN-SUFFIX,ifeng.com,DIRECT
+  - DOMAIN-SUFFIX,iqiyi.com,DIRECT
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,microsoft.com,DIRECT
+  - DOMAIN-SUFFIX,microsoftonline.com,DIRECT
+  - DOMAIN-SUFFIX,netease.com,DIRECT
+  - DOMAIN-SUFFIX,office.com,DIRECT
+  - DOMAIN-SUFFIX,office365.com,DIRECT
+  - DOMAIN-KEYWORD,officecdn,DIRECT
+  - DOMAIN-SUFFIX,ppsimg.com,DIRECT
+  - DOMAIN-SUFFIX,qcloud.com,DIRECT
+  - DOMAIN-SUFFIX,qhimg.com,DIRECT
+  - DOMAIN-SUFFIX,qhres.com,DIRECT
+  - DOMAIN-SUFFIX,qiniu.com,DIRECT
+  - DOMAIN-SUFFIX,qiniucdn.com,DIRECT
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,sinaapp.com,DIRECT
+  - DOMAIN-SUFFIX,smzdm.com,DIRECT
+  - DOMAIN-SUFFIX,sogou.com,DIRECT
+  - DOMAIN-SUFFIX,sogoucdn.com,DIRECT
+  - DOMAIN-SUFFIX,sohu.com,DIRECT
+  - DOMAIN-SUFFIX,speedtest.net,DIRECT
+  - DOMAIN-SUFFIX,sspai.com,DIRECT
+  - DOMAIN-SUFFIX,suning.com,DIRECT
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tencent.com,DIRECT
+  - DOMAIN-SUFFIX,tudou.com,DIRECT
+  - DOMAIN-SUFFIX,weibo.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,youdao.com,DIRECT
+  - DOMAIN-SUFFIX,zhihu.com,DIRECT
+
+  # 屏蔽广告服务
+  - DOMAIN-KEYWORD,admarvel,REJECT
+  - DOMAIN-KEYWORD,admaster,REJECT
+  - DOMAIN-KEYWORD,adsage,REJECT
+  - DOMAIN-KEYWORD,adsmogo,REJECT
+  - DOMAIN-KEYWORD,adsrvmedia,REJECT
+  - DOMAIN-KEYWORD,adwords,REJECT
+  - DOMAIN-KEYWORD,adservice,REJECT
+  - DOMAIN-SUFFIX,doubleclick.net,REJECT
+  - DOMAIN-SUFFIX,appsflyer.com,REJECT
+  - DOMAIN-SUFFIX,vungle.com,REJECT
+
+  # 将局域网流量通过 手动选择-住宅03
+  - DOMAIN-SUFFIX,local,手动选择-住宅03
+  - IP-CIDR,127.0.0.0/8,手动选择-住宅03
+  - IP-CIDR,172.16.0.0/12,手动选择-住宅03
+  - IP-CIDR,192.168.0.0/16,手动选择-住宅03
+  - IP-CIDR,10.0.0.0/8,手动选择-住宅03
+  - IP-CIDR,17.0.0.0/8,手动选择-住宅03
+  - IP-CIDR,100.64.0.0/10,手动选择-住宅03
+  - IP-CIDR,224.0.0.0/4,手动选择-住宅03
+  - IP-CIDR6,fe80::/10,手动选择-住宅03
+
+  # 根据国家/地区地理IP路由
+  - GEOIP,CN,DIRECT
+
+  # 其他未明确规则的流量，走 手动选择-住宅03
+  - MATCH,手动选择-住宅03
