@@ -59,14 +59,6 @@ proxies:
 #分流组可自行创建添加，proxies参数下的name节点名称，按需求自行增减，确保出现的name节点名称在二区代理协议中可查找
 proxy-groups:
 
-- name: 自动选择
-  type: url-test
-  url: https://cp.cloudflare.com/generate_204
-  interval: 300
-  tolerance: 50
-  proxies:
-    - vless-reality-vision节点                            #自定义添加协议的name字段
-    - vless-reality-grpc节点
 
 - name: 手动选择-住宅01
   type: select
