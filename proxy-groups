@@ -18,3 +18,12 @@ proxy-groups:
       - vmess1
     url: 'http://www.gstatic.com/generate_204'
     interval: 300
+
+- name: "load-balance"
+  type: load-balance
+  proxies:
+    - ss1
+    - ss2
+    - vmess1
+  url: 'http://www.gstatic.com/generate_204'
+  interval: 300
