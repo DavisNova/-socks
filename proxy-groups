@@ -1,0 +1,41 @@
+proxy-groups:
+  # relay chains the proxies. proxies shall not contain a relay. No UDP support.
+  # Traffic: clash <-> http <-> vmess <-> ss1 <-> ss2 <-> Internet
+  #proxies:
+  #- name: "http"
+  # type: http
+  #  server: example-http.com
+  # port: 8080
+  #  username: user
+  # password: pass
+
+  #- name: "vmess"
+  # type: vmess
+  #  server: example-vmess.com
+  #  port: 443
+  #  uuid: your-uuid
+  #  alterId: 0
+  #  cipher: auto
+  #  tls: true
+
+  #- name: "ss1"
+  #  type: ss
+  #  server: example-ss1.com
+  #  port: 8388
+  #  cipher: aes-256-gcm
+  #  password: your-password
+
+  #- name: "ss2"
+  #  type: ss
+  #  server: example-ss2.com
+  #  port: 8388
+  #  cipher: aes-256-gcm
+  #  password: your-password
+
+  - name: "relay"
+    type: relay
+    proxies:
+      - http
+      - vmess
+      - ss1
+      - ss2
