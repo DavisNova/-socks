@@ -217,5 +217,182 @@ Clash 的 load-balance 类型代理组在处理高并发任务时，会依据其
 这种分配机制确保了在高并发和负载条件下，流量能够均匀分布在多个代理之间，提供更稳定和高效的连接。
 
 
+4.    select 变种 interface-name: en1        routing-mark: 6667
+4.1 样例
+  - name: en1
+    type: select
+    interface-name: en1
+    routing-mark: 6667
+    proxies:
+      - DIRECT
+4.2解析
+假设你的路由器有以下网络接口：
+
+en1
+
+en2
+
+en3
+
+WiFi
+
+你希望通过WiFi接口传输某些特定的流量，并指定使用特定的代理。
+
+在操作系统中配置路由规则，使标记为特定值（如 6668 ）的流量通过WiFi接口传输。例如，在Linux系统中，可以使用ip rule和ip route命令来设置路由规则：
+
+bash
+ip rule add fwmark 6668 table 100
+ip route add default via 192.168.1.1 dev wifi table 100
+Clash配置文件：
+
+在Clash的配置文件中添加WiFi接口的配置：
+
+yaml
+proxy-groups:
+  - name: wifi
+    type: select
+    interface-name: wifi
+    routing-mark: 6668
+    proxies:
+      - DIRECT
+      - Proxy-1
+      - Proxy-2
+添加代理服务器配置：
+
+定义你的代理服务器配置，例如：
+
+yaml
+proxies:
+  - name: "Proxy-1"
+    type: ss
+    server: example-ss1.com
+    port: 8388
+    cipher: aes-256-gcm
+    password: your-password
+
+  - name: "Proxy-2"
+    type: vmess
+    server: example-vmess.com
+    port: 443
+    uuid: your-uuid
+    alterId: 0
+    cipher: auto
+    tls: true
+流量规则：
+
+在Clash的规则中，将特定的流量路由到WiFi接口的代理组：
+
+yaml
+rules:
+  - DOMAIN-SUFFIX,special-domain.com,wifi
+  - MATCH,load-balance
+整个配置文件示例
+yaml
+mixed-port: 7890
+allow-lan: true
+mode: Rule
+log-level: info
+external-controller: 127.0.0.1:9090
+
+proxies:
+  - name: "Proxy-1"
+    type: ss
+    server: example-ss1.com
+    port: 8388
+    cipher: aes-256-gcm
+    password: your-password
+
+  - name: "Proxy-2"
+    type: vmess
+    server: example-vmess.com
+    port: 443
+    uuid: your-uuid
+    alterId: 0
+    cipher: auto
+    tls: true
+
+proxy-groups:
+  - name: wifi
+    type: select
+    interface-name: wifi
+    routing-mark: 6668
+    proxies:
+      - DIRECT
+      - Proxy-1
+      - Proxy-2
+
+  - name: load-balance
+    type: load-balance
+    proxies:
+      - Proxy-1
+      - Proxy-2
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 300
+
+rules:
+  - DOMAIN-SUFFIX,special-domain.com,wifi
+  - MATCH,load-balance
+在这个配置中，访问 special-domain.com 的流量会通过WiFi接口传输，并且可以选择DIRECT或指定的代理 (Proxy-1 和 Proxy-2)。其他流量将通过负载均衡代理组进行分配
+
+
+
+如果你要求所有通过WiFi的流量都走代理，那么确实不需要加上 - DOMAIN-SUFFIX,special-domain.com,wifi 这条规则。
+
+你可以直接设置一条通配符规则，将所有流量通过 wifi 代理组处理。这么做将确保任何通过WiFi接口传输的流量都走指定的代理。
+
+更新后的配置文件示例
+yaml
+mixed-port: 7890
+allow-lan: true
+mode: Rule
+log-level: info
+external-controller: 127.0.0.1:9090
+
+proxies:
+  - name: "Proxy-1"
+    type: ss
+    server: example-ss1.com
+    port: 8388
+    cipher: aes-256-gcm
+    password: your-password
+
+  - name: "Proxy-2"
+    type: vmess
+    server: example-vmess.com
+    port: 443
+    uuid: your-uuid
+    alterId: 0
+    cipher: auto
+    tls: true
+
+proxy-groups:
+  - name: wifi
+    type: select
+    interface-name: wifi
+    routing-mark: 6668
+    proxies:
+      - Proxy-1
+      - Proxy-2
+
+  - name: load-balance
+    type: load-balance
+    proxies:
+      - Proxy-1
+      - Proxy-2
+    url: 'http://www.gstatic.com/generate_204'
+    interval: 300
+
+rules:
+  - MATCH,wifi
+在这个配置中：
+
+所有通过WiFi接口的流量都将按照 wifi 代理组进行处理。
+
+wifi 代理组包含 Proxy-1 和 Proxy-2，意味着所有WiFi流量会通过这两个代理之一。
+
+这样设置后，所有通过WiFi的流量将会走指定的代理，无需再添加具体的域名规则。
+
+
+
 
 
