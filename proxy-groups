@@ -27,3 +27,13 @@ proxy-groups:
     - vmess1
   url: 'http://www.gstatic.com/generate_204'
   interval: 300
+
+
+  - name: en1
+    type: select
+    interface-name: en1
+    routing-mark: 6667
+    proxies:
+      - DIRECT
+
+
